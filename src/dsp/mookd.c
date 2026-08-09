@@ -230,9 +230,7 @@ typedef struct synth {
     int   gate;
     float note_freq, glide_freq;   /* target vs current (glide) */
     float velocity;
-    int   bank_idx;                 /* current bank (BANKS[]) */
-    int   preset_idx;               /* preset index LOCAL to bank_idx (0..bank size-1) */
-    int   octave_transpose;         /* semitones, = octaves*12, applied in note_on/off */
+    int   preset_idx;              /* last preset applied via set_param("preset", ...) */
 
     char  err[128];
 } synth_t;
@@ -282,55 +280,44 @@ typedef struct {
  *         cut,emph,cont,fa,fd,fs,kt, la,ld,ls,dsw, glide,modmix,modosc,modfilt,
  *         lr,lsh,lp,lf, vol                                                     */
 static const preset_t PRESETS[] = {
- /* --- Bank 0: Bass (indices 0-9) --- */
  {"Init", 3, 1, 3, 1, -0.07f, 2, 1, 0.05f, 1, 0.8f, 0.7f, 0.6f, 0.0f, 0, 0.45f, 0.35f, 0.65f, 0.005f, 0.35f, 0.15f, 1, 0.005f, 0.5f, 0.8f, 1, 0, 0, 0, 0, 0.35f, 0, 0, 0, 0, 4, 0, 0.00f, 0.8f},
  {"Fat Bass", 3, 1, 3, 1, -0.10f, 2, 1, 0.06f, 1, 0.85f, 0.75f, 0.55f, 0, 0, 0.30f, 0.40f, 0.75f, 0.004f, 0.30f, 0.05f, 1, 0.004f, 0.35f, 0.6f, 1, 0, 0, 0, 0, 0.35f, 0, 0, 0, 0, 4, 0, 0.00f, 0.85f},
  {"Sub Bass", 3, 0, 2, 0, 0.0f, 1, 0, 0.0f, 1, 0.9f, 0.6f, 0.7f, 0, 0, 0.22f, 0.20f, 0.45f, 0.004f, 0.25f, 0.0f, 1, 0.004f, 0.30f, 0.7f, 1, 0, 0, 0, 0, 0.35f, 0, 0, 0, 0, 4, 0, 0.00f, 0.9f},
  {"Rubber Bass", 3, 2, 3, 2, -0.08f, 2, 2, 0.05f, 1, 0.8f, 0.7f, 0.4f, 0, 0, 0.28f, 0.55f, 0.80f, 0.003f, 0.18f, 0.0f, 1, 0.003f, 0.22f, 0.4f, 1, 0, 0, 0, 0, 0.35f, 0, 0, 0, 0, 4, 0, 0.00f, 0.85f},
+ {"Classic Lead", 3, 1, 3, 1, -0.06f, 4, 1, 0.04f, 1, 0.8f, 0.75f, 0.6f, 0, 0, 0.55f, 0.30f, 0.55f, 0.006f, 0.4f, 0.7f, 1, 0.006f, 0.5f, 0.9f, 1, 0.08f, 0, 0, 0, 0.30f, 0, 0.12f, 0, 0, 4, 0, 0.00f, 0.8f},
+ {"Brass", 3, 1, 3, 1, -0.05f, 3, 1, 0.0f, 1, 0.8f, 0.7f, 0.5f, 0, 0, 0.42f, 0.28f, 0.60f, 0.08f, 0.5f, 0.55f, 1, 0.06f, 0.6f, 0.85f, 1, 0, 0, 0, 0, 0.30f, 0, 0, 0, 0, 4, 0, 0.00f, 0.8f},
+ {"Funk Lead", 4, 4, 4, 4, -0.05f, 3, 1, 0.0f, 1, 0.85f, 0.5f, 0.45f, 0, 0, 0.40f, 0.65f, 0.85f, 0.003f, 0.14f, 0.0f, 1, 0.003f, 0.25f, 0.5f, 1, 0, 0, 0, 0, 0.30f, 0, 0, 0, 0, 4, 0, 0.00f, 0.8f},
  {"Wobble Bass", 3, 2, 3, 2, -0.08f, 2, 2, 0.0f, 1, 0.85f, 0.7f, 0.4f, 0, 0, 0.22f, 0.60f, 0.30f, 0.004f, 0.3f, 0.4f, 1, 0.004f, 0.4f, 0.8f, 1, 0, 0, 0, 0, 0.18f, 2, 0.0f, 0.7f, 1, 5, 0, 0.00f, 0.85f},
+ {"Vibrato Lead", 3, 1, 3, 1, -0.04f, 4, 1, 0.0f, 1, 0.8f, 0.75f, 0.5f, 0, 0, 0.55f, 0.30f, 0.45f, 0.01f, 0.5f, 0.9f, 1, 0.01f, 0.5f, 0.9f, 1, 0.05f, 0, 0, 0, 0.30f, 0, 0.25f, 0, 0, 4, 0, 0.00f, 0.8f},
+ {"Sci-Fi Sweep", 3, 1, 2, 1, -0.20f, 2, 1, 0.12f, 1, 0.7f, 0.7f, 0.7f, 0, 0, 0.20f, 0.70f, 0.30f, 0.4f, 1.0f, 0.6f, 0, 0.3f, 1.0f, 0.9f, 1, 0, 0, 0, 0, 0.06f, 0, 0.0f, 0.8f, 0, 4, 0, 0.00f, 0.8f},
+ {"Bright Pluck", 4, 1, 3, 1, -0.05f, 3, 1, 0.0f, 1, 0.8f, 0.6f, 0.5f, 0, 0, 0.60f, 0.35f, 0.70f, 0.002f, 0.12f, 0.0f, 1, 0.002f, 0.18f, 0.0f, 1, 0, 0, 0, 0, 0.30f, 0, 0, 0, 0, 4, 0, 0.00f, 0.8f},
+ {"Detuned Stab", 3, 2, 3, 2, -0.5f, 2, 2, 0.5f, 1, 0.8f, 0.8f, 0.7f, 0, 0, 0.45f, 0.40f, 0.60f, 0.004f, 0.2f, 0.0f, 1, 0.004f, 0.25f, 0.3f, 1, 0, 0, 0, 0, 0.30f, 0, 0, 0, 0, 4, 0, 0.00f, 0.82f},
+ {"Whistle", 5, 0, 4, 0, 0.0f, 4, 0, 0.0f, 1, 0.9f, 0.4f, 0.3f, 0, 0, 0.75f, 0.20f, 0.20f, 0.03f, 0.3f, 0.9f, 1, 0.02f, 0.4f, 0.95f, 1, 0.04f, 0, 0, 0, 0.25f, 0, 0.10f, 0, 0, 4, 0, 0.00f, 0.75f},
+ {"Noise Sweep", 3, 1, 2, 1, 0.0f, 2, 1, 0.0f, 1, 0.3f, 0.3f, 0.2f, 0.9f, 0, 0.25f, 0.55f, 0.35f, 0.2f, 0.8f, 0.4f, 0, 0.2f, 0.9f, 0.8f, 1, 0, 0, 0, 0, 0.05f, 0, 0.0f, 0.6f, 0, 4, 0, 0.00f, 0.8f},
+ {"Sync Lead",   3,1,3,1,0.0f,4,1,0.0f,1, 0.85f,0.8f,0.0f,0,0, 0.55f,0.30f,0.55f,0.006f,0.4f,0.7f,1, 0.006f,0.5f,0.9f,1, 0.05f,0,0,0, 0.30f,0,0.10f,0, 0,4,1,0.0f, 0.8f},
  {"FM Growl",    3,1,2,1,-0.1f,4,1,0.0f,0, 0.8f,0.6f,0.0f,0,0, 0.30f,0.55f,0.40f,0.01f,0.4f,0.3f,1, 0.006f,0.5f,0.7f,1, 0,0,0,0, 0.30f,0,0,0, 0,4,0,0.55f, 0.82f},
+ /* --- expansion bank: 16 more, inspired by classic Model D patch vocabulary
+  *     (Bass/Lead/Pad/Bell/FX categories seen across open-source Minimoog
+  *     emulators such as stevebarakat/Minimoog) but authored fresh for this
+  *     module's own DSP and parameter ranges. */
  {"Taurus Sub",    1,1,1,3,-0.05f,0,0,0.0f,1, 0.9f,0.6f,0.5f,0,0, 0.18f,0.30f,0.55f,0.005f,0.4f,0.6f,1, 0.005f,0.6f,0.85f,1, 0,0,0,0, 0.35f,0,0,0, 0,4,0,0.00f, 0.85f},
  {"Slap Bass",     3,1,3,3,-0.10f,2,0,0.08f,1, 0.8f,0.7f,0.3f,0,0, 0.35f,0.65f,0.80f,0.001f,0.10f,0.0f,1, 0.001f,0.15f,0.0f,0, 0,0,0,0, 0.35f,0,0,0, 0,4,0,0.00f, 0.85f},
  {"Dub Bass",      2,1,2,0,-0.06f,1,1,0.0f,1, 0.85f,0.6f,0.5f,0,0, 0.16f,0.35f,0.45f,0.02f,0.6f,0.5f,1, 0.01f,0.7f,0.75f,1, 0.05f,0,0,0, 0.10f,0,0,0.15f, 0,4,0,0.00f, 0.85f},
  {"Growl Bass",    3,1,3,1,-0.15f,2,0,0.0f,0, 0.8f,0.6f,0.0f,0,0, 0.22f,0.50f,0.60f,0.005f,0.3f,0.3f,1, 0.005f,0.35f,0.6f,1, 0,0,0,0, 0.35f,0,0,0, 0,4,0,0.40f, 0.85f},
- /* --- Bank 1: Lead (indices 10-19) --- */
- {"Classic Lead", 3, 1, 3, 1, -0.06f, 4, 1, 0.04f, 1, 0.8f, 0.75f, 0.6f, 0, 0, 0.55f, 0.30f, 0.55f, 0.006f, 0.4f, 0.7f, 1, 0.006f, 0.5f, 0.9f, 1, 0.08f, 0, 0, 0, 0.30f, 0, 0.12f, 0, 0, 4, 0, 0.00f, 0.8f},
- {"Brass", 3, 1, 3, 1, -0.05f, 3, 1, 0.0f, 1, 0.8f, 0.7f, 0.5f, 0, 0, 0.42f, 0.28f, 0.60f, 0.08f, 0.5f, 0.55f, 1, 0.06f, 0.6f, 0.85f, 1, 0, 0, 0, 0, 0.30f, 0, 0, 0, 0, 4, 0, 0.00f, 0.8f},
- {"Funk Lead", 4, 4, 4, 4, -0.05f, 3, 1, 0.0f, 1, 0.85f, 0.5f, 0.45f, 0, 0, 0.40f, 0.65f, 0.85f, 0.003f, 0.14f, 0.0f, 1, 0.003f, 0.25f, 0.5f, 1, 0, 0, 0, 0, 0.30f, 0, 0, 0, 0, 4, 0, 0.00f, 0.8f},
- {"Vibrato Lead", 3, 1, 3, 1, -0.04f, 4, 1, 0.0f, 1, 0.8f, 0.75f, 0.5f, 0, 0, 0.55f, 0.30f, 0.45f, 0.01f, 0.5f, 0.9f, 1, 0.01f, 0.5f, 0.9f, 1, 0.05f, 0, 0, 0, 0.30f, 0, 0.25f, 0, 0, 4, 0, 0.00f, 0.8f},
- {"Detuned Stab", 3, 2, 3, 2, -0.5f, 2, 2, 0.5f, 1, 0.8f, 0.8f, 0.7f, 0, 0, 0.45f, 0.40f, 0.60f, 0.004f, 0.2f, 0.0f, 1, 0.004f, 0.25f, 0.3f, 1, 0, 0, 0, 0, 0.30f, 0, 0, 0, 0, 4, 0, 0.00f, 0.82f},
- {"Sync Lead",   3,1,3,1,0.0f,4,1,0.0f,1, 0.85f,0.8f,0.0f,0,0, 0.55f,0.30f,0.55f,0.006f,0.4f,0.7f,1, 0.006f,0.5f,0.9f,1, 0.05f,0,0,0, 0.30f,0,0.10f,0, 0,4,1,0.0f, 0.8f},
+ {"Warm Pad",      3,1,3,0,-0.10f,4,1,0.10f,1, 0.7f,0.6f,0.4f,0,0, 0.50f,0.20f,0.45f,0.6f,1.2f,0.7f,1, 0.7f,1.0f,0.85f,1, 0.1f,0,0,0, 0.15f,0,0.05f,0, 0,4,0,0.00f, 0.75f},
+ {"Glass Pad",     4,0,5,1,0.15f,4,1,-0.12f,1, 0.6f,0.5f,0.5f,0,0, 0.75f,0.15f,0.35f,0.5f,1.5f,0.6f,1, 0.6f,1.3f,0.8f,1, 0.08f,0,0,0, 0.20f,0,0,0.12f, 0,4,0,0.00f, 0.70f},
+ {"Cathedral Drone",0,1,1,0,-0.05f,2,1,0.07f,1, 0.6f,0.6f,0.4f,0.08f,1, 0.35f,0.25f,0.30f,1.5f,2.0f,0.6f,0, 1.2f,2.5f,0.9f,1, 0.3f,0,0,0, 0.02f,0,0,0.20f, 1,0,0,0.00f, 0.65f},
  {"Prog Solo",     4,1,4,1,-0.05f,5,0,0.06f,1, 0.85f,0.75f,0.4f,0,0, 0.60f,0.45f,0.60f,0.008f,0.45f,0.75f,1, 0.008f,0.5f,0.9f,1, 0.12f,0,0,0, 0.32f,0,0.15f,0.08f, 0,4,0,0.00f, 0.80f},
  {"Screamer Lead", 4,2,4,1,-0.04f,3,1,0.09f,1, 0.85f,0.7f,0.35f,0,0, 0.65f,0.85f,0.70f,0.003f,0.3f,0.65f,1, 0.003f,0.35f,0.85f,1, 0,0,0,0, 0.35f,0,0,0, 0,4,0,0.00f, 0.80f},
  {"Watery Lead",   3,0,3,1,-0.15f,4,0,0.10f,1, 0.7f,0.65f,0.4f,0,0, 0.45f,0.25f,0.40f,0.05f,0.6f,0.6f,1, 0.05f,0.7f,0.8f,1, 0.05f,0,0,0, 0.12f,0,0.10f,0.15f, 0,4,0,0.00f, 0.75f},
  {"Simple Lead",   3,1,3,1,-0.03f,4,1,0.0f,1, 0.85f,0.5f,0.15f,0,0, 0.50f,0.20f,0.50f,0.005f,0.4f,0.7f,1, 0.005f,0.45f,0.85f,1, 0,0,0,0, 0.35f,0,0,0, 0,4,0,0.00f, 0.80f},
- /* --- Bank 2: Pad/Drone (indices 20-23) --- */
- {"Warm Pad",      3,1,3,0,-0.10f,4,1,0.10f,1, 0.7f,0.6f,0.4f,0,0, 0.50f,0.20f,0.45f,0.6f,1.2f,0.7f,1, 0.7f,1.0f,0.85f,1, 0.1f,0,0,0, 0.15f,0,0.05f,0, 0,4,0,0.00f, 0.75f},
- {"Glass Pad",     4,0,5,1,0.15f,4,1,-0.12f,1, 0.6f,0.5f,0.5f,0,0, 0.75f,0.15f,0.35f,0.5f,1.5f,0.6f,1, 0.6f,1.3f,0.8f,1, 0.08f,0,0,0, 0.20f,0,0,0.12f, 0,4,0,0.00f, 0.70f},
- {"Cathedral Drone",0,1,1,0,-0.05f,2,1,0.07f,1, 0.6f,0.6f,0.4f,0.08f,1, 0.35f,0.25f,0.30f,1.5f,2.0f,0.6f,0, 1.2f,2.5f,0.9f,1, 0.3f,0,0,0, 0.02f,0,0,0.20f, 1,0,0,0.00f, 0.65f},
- {"Cosmic Drone",  0,1,0,0,0.03f,1,1,-0.04f,1, 0.6f,0.5f,0.4f,0.15f,1, 0.28f,0.40f,0.50f,2.0f,3.0f,0.5f,0, 1.5f,3.5f,0.85f,1, 0.4f,0,0,0, 0.03f,0,0,0.35f, 1,1,0,0.00f, 0.60f},
- /* --- Bank 3: Bell/FX (indices 24-31) --- */
- {"Bright Pluck", 4, 1, 3, 1, -0.05f, 3, 1, 0.0f, 1, 0.8f, 0.6f, 0.5f, 0, 0, 0.60f, 0.35f, 0.70f, 0.002f, 0.12f, 0.0f, 1, 0.002f, 0.18f, 0.0f, 1, 0, 0, 0, 0, 0.30f, 0, 0, 0, 0, 4, 0, 0.00f, 0.8f},
  {"Crystal Bells", 4,0,5,1,0.5f,5,0,-0.7f,0, 0.6f,0.55f,0.0f,0,0, 0.80f,0.30f,0.60f,0.001f,0.4f,0.0f,1, 0.001f,0.9f,0.0f,0, 0,0,0,0, 0.35f,0,0,0, 0,4,0,0.35f, 0.75f},
  {"Wind Chimes",   4,0,5,0,0.35f,5,0,-0.4f,0, 0.5f,0.5f,0.0f,0.05f,0, 0.70f,0.20f,0.30f,0.01f,1.2f,0.0f,1, 0.01f,1.4f,0.0f,0, 0,0.3f,1,0, 0.08f,4,0.05f,0, 0,4,0,0.00f, 0.70f},
- {"Sci-Fi Sweep", 3, 1, 2, 1, -0.20f, 2, 1, 0.12f, 1, 0.7f, 0.7f, 0.7f, 0, 0, 0.20f, 0.70f, 0.30f, 0.4f, 1.0f, 0.6f, 0, 0.3f, 1.0f, 0.9f, 1, 0, 0, 0, 0, 0.06f, 0, 0.0f, 0.8f, 0, 4, 0, 0.00f, 0.8f},
- {"Whistle", 5, 0, 4, 0, 0.0f, 4, 0, 0.0f, 1, 0.9f, 0.4f, 0.3f, 0, 0, 0.75f, 0.20f, 0.20f, 0.03f, 0.3f, 0.9f, 1, 0.02f, 0.4f, 0.95f, 1, 0.04f, 0, 0, 0, 0.25f, 0, 0.10f, 0, 0, 4, 0, 0.00f, 0.75f},
- {"Noise Sweep", 3, 1, 2, 1, 0.0f, 2, 1, 0.0f, 1, 0.3f, 0.3f, 0.2f, 0.9f, 0, 0.25f, 0.55f, 0.35f, 0.2f, 0.8f, 0.4f, 0, 0.2f, 0.9f, 0.8f, 1, 0, 0, 0, 0, 0.05f, 0, 0.0f, 0.6f, 0, 4, 0, 0.00f, 0.8f},
  {"Submarine Sonar",2,0,2,0,0.02f,3,1,0.0f,1, 0.7f,0.3f,0.0f,0,0, 0.30f,0.70f,0.50f,0.002f,0.5f,0.2f,0, 0.002f,1.0f,0.3f,0, 0,0,0,0, 0.06f,4,0,0.50f, 0,4,0,0.00f, 0.70f},
  {"Alien Signal",  4,2,4,2,0.30f,5,1,-0.20f,0, 0.7f,0.6f,0.0f,0,0, 0.40f,0.55f,0.65f,0.01f,0.5f,0.4f,0, 0.01f,0.6f,0.6f,1, 0,0,0,0, 0.40f,1,0.10f,0.10f, 0,4,2,0.30f, 0.75f},
+ {"Cosmic Drone",  0,1,0,0,0.03f,1,1,-0.04f,1, 0.6f,0.5f,0.4f,0.15f,1, 0.28f,0.40f,0.50f,2.0f,3.0f,0.5f,0, 1.5f,3.5f,0.85f,1, 0.4f,0,0,0, 0.03f,0,0,0.35f, 1,1,0,0.00f, 0.60f},
 };
 #define NPRESETS ((int)(sizeof(PRESETS)/sizeof(PRESETS[0])))
-
-/* --- preset banks, matching the shared Schwung sound_generator_ui.mjs
- * bank/patch contract (bank_index / preset_count / preset_name / etc). --- */
-typedef struct { const char *name; int start, count; } bank_t;
-static const bank_t BANKS[] = {
- {"Bass",      0, 10},
- {"Lead",     10, 10},
- {"Pad/Drone",20,  4},
- {"Bell/FX",  24,  8},
-};
-#define NBANKS ((int)(sizeof(BANKS)/sizeof(BANKS[0])))
 
 static void apply_preset(params_t *p, int idx){
     if (idx < 0 || idx >= NPRESETS) return;
@@ -358,9 +345,7 @@ static void *create_instance(const char *dir, const char *json){
     init_params(&s->p);
     s->note_freq = s->glide_freq = 220.0f;
     s->velocity  = 0.7f;
-    s->bank_idx = 0;
     s->preset_idx = 0;
-    s->octave_transpose = 0;
     s->o1.range=s->p.o1_range; s->o1.wave=s->p.o1_wave;
     s->o2.range=s->p.o2_range; s->o2.wave=s->p.o2_wave;
     s->o3.range=s->p.o3_range; s->o3.wave=s->p.o3_wave;
@@ -372,7 +357,7 @@ static void destroy_instance(void *inst){ free(inst); }
 /* ------------------------------------------------------------- MIDI      */
 static void note_on(synth_t *s, int note, int vel){
     if (s->nheld < 8) s->held[s->nheld++] = note;
-    s->note_freq = midi2hz((float)(note + s->octave_transpose));
+    s->note_freq = midi2hz((float)note);
     s->velocity  = vel / 127.0f;
     s->gate = 1;
     adsr_gate(&s->fenv, 1);
@@ -383,18 +368,12 @@ static void note_off(synth_t *s, int note){
     for (i = 0; i < s->nheld; ++i) if (s->held[i] != note) s->held[j++] = s->held[i];
     s->nheld = j;
     if (s->nheld > 0){                    /* last-note priority: fall back */
-        s->note_freq = midi2hz((float)(s->held[s->nheld-1] + s->octave_transpose));
+        s->note_freq = midi2hz((float)s->held[s->nheld-1]);
     } else {
         s->gate = 0;
         adsr_gate(&s->fenv, 0);
         adsr_gate(&s->aenv, 0);
     }
-}
-static void all_notes_off(synth_t *s){
-    s->nheld = 0;
-    s->gate = 0;
-    adsr_gate(&s->fenv, 0);
-    adsr_gate(&s->aenv, 0);
 }
 static void on_midi(void *inst, const uint8_t *m, int len, int src){
     (void)src;
@@ -480,11 +459,7 @@ static void set_param(void *inst, const char *k, const char *v){
     else if (!strcmp(k,"filt_fm"))   p->filt_fm=fparse(v);
     else if (!strcmp(k,"volume"))    p->volume=fparse(v);
     else if (!strcmp(k,"preset")){
-        /* Name match searches ALL banks (keeps the flat chain_params enum
-         * working) and auto-switches bank_idx to wherever the name lives.
-         * A bare number is interpreted as LOCAL to the current bank, per
-         * the shared sound_generator_ui.mjs bank/patch contract. */
-        int global = -1;
+        int idx = -1;
         for (int i = 0; i < NPRESETS; ++i){
             const char *a=v,*b=PRESETS[i].name; int m=1;
             while (*a && *b){ char ca=*a,cb=*b;
@@ -492,43 +467,15 @@ static void set_param(void *inst, const char *k, const char *v){
                 if(cb>='A'&&cb<='Z')cb+=32;
                 if(ca!=cb){m=0;break;}
                 ++a;++b; }
-            if (m && !*a && !*b){ global=i; break; }
+            if (m && !*a && !*b){ idx=i; break; }
         }
-        if (global >= 0){
-            for (int b = 0; b < NBANKS; ++b){
-                if (global >= BANKS[b].start && global < BANKS[b].start + BANKS[b].count){
-                    s->bank_idx = b;
-                    s->preset_idx = global - BANKS[b].start;
-                    break;
-                }
-            }
-        } else {
-            int local = (int)strtol(v, NULL, 10);
-            int bsz = BANKS[s->bank_idx].count;
-            if (local < 0) local = 0;
-            if (local >= bsz) local = bsz - 1;
-            s->preset_idx = local;
-            global = BANKS[s->bank_idx].start + s->preset_idx;
-        }
-        apply_preset(p, global);
+        if (idx < 0) idx = (int)strtol(v, NULL, 10);  /* numeric fallback */
+        if (idx >= 0 && idx < NPRESETS) s->preset_idx = idx;
+        apply_preset(p, idx);
         s->o1.range=p->o1_range; s->o1.wave=p->o1_wave;
         s->o2.range=p->o2_range; s->o2.wave=p->o2_wave;
         s->o3.range=p->o3_range; s->o3.wave=p->o3_wave;
     }
-    else if (!strcmp(k,"bank_index")){
-        int b = (int)strtol(v, NULL, 10);
-        if (b < 0) b = 0;
-        if (b >= NBANKS) b = NBANKS - 1;
-        s->bank_idx = b;
-        if (s->preset_idx >= BANKS[b].count) s->preset_idx = 0;
-    }
-    else if (!strcmp(k,"octave_transpose")){
-        int oct = (int)strtol(v, NULL, 10);
-        if (oct < -4) oct = -4;
-        if (oct > 4) oct = 4;
-        s->octave_transpose = oct * 12;
-    }
-    else if (!strcmp(k,"all_notes_off")) all_notes_off(s);
 }
 /* Mirrors set_param's key list so every knob/menu item can read back its
  * current value. Floats render as decimals; enum/int-backed params render
@@ -574,15 +521,9 @@ static int get_param(void *inst, const char *k, char *buf, int n){
     else if (!strcmp(k,"osc_sync"))    i=p->osc_sync;
     else if (!strcmp(k,"filt_fm"))     { f=p->filt_fm;   goto ffmt; }
     else if (!strcmp(k,"volume"))      { f=p->volume;    goto ffmt; }
-    else if (!strcmp(k,"preset"))       i=s->preset_idx;
-    else if (!strcmp(k,"preset_count")) i=BANKS[s->bank_idx].count;
-    else if (!strcmp(k,"preset_name"))
-        return snprintf(buf, n, "%s", PRESETS[BANKS[s->bank_idx].start + s->preset_idx].name);
-    else if (!strcmp(k,"bank_index"))   i=s->bank_idx;
-    else if (!strcmp(k,"bank_count"))   i=NBANKS;
-    else if (!strcmp(k,"bank_name"))    return snprintf(buf, n, "%s", BANKS[s->bank_idx].name);
-    else if (!strcmp(k,"patch_in_bank")) i=s->preset_idx + 1;
-    else if (!strcmp(k,"octave_transpose")) i=s->octave_transpose / 12;
+    else if (!strcmp(k,"preset"))      i=s->preset_idx;
+    else if (!strcmp(k,"preset_count")) i=NPRESETS;
+    else if (!strcmp(k,"preset_name")) return snprintf(buf, n, "%s", PRESETS[s->preset_idx].name);
     else return -1;
     return snprintf(buf, n, "%d", i);
 ffmt:
