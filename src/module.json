@@ -86,8 +86,12 @@
             "o1_wave"
           ],
           "params": [
-            "o1_range",
-            "o1_wave"
+            {
+              "key": "o1_range"
+            },
+            {
+              "key": "o1_wave"
+            }
           ]
         },
         "osc2": {
@@ -98,9 +102,15 @@
             "o2_tune"
           ],
           "params": [
-            "o2_range",
-            "o2_wave",
-            "o2_tune"
+            {
+              "key": "o2_range"
+            },
+            {
+              "key": "o2_wave"
+            },
+            {
+              "key": "o2_tune"
+            }
           ]
         },
         "osc3": {
@@ -113,11 +123,21 @@
             "osc_sync"
           ],
           "params": [
-            "o3_range",
-            "o3_wave",
-            "o3_tune",
-            "o3_kbd",
-            "osc_sync"
+            {
+              "key": "o3_range"
+            },
+            {
+              "key": "o3_wave"
+            },
+            {
+              "key": "o3_tune"
+            },
+            {
+              "key": "o3_kbd"
+            },
+            {
+              "key": "osc_sync"
+            }
           ]
         },
         "mixer": {
@@ -131,12 +151,24 @@
             "volume"
           ],
           "params": [
-            "mix_o1",
-            "mix_o2",
-            "mix_o3",
-            "mix_noise",
-            "noise_color",
-            "volume"
+            {
+              "key": "mix_o1"
+            },
+            {
+              "key": "mix_o2"
+            },
+            {
+              "key": "mix_o3"
+            },
+            {
+              "key": "mix_noise"
+            },
+            {
+              "key": "noise_color"
+            },
+            {
+              "key": "volume"
+            }
           ]
         },
         "filter": {
@@ -152,14 +184,30 @@
             "kbd_track"
           ],
           "params": [
-            "cutoff",
-            "emphasis",
-            "contour",
-            "filt_fm",
-            "filt_a",
-            "filt_d",
-            "filt_s",
-            "kbd_track"
+            {
+              "key": "cutoff"
+            },
+            {
+              "key": "emphasis"
+            },
+            {
+              "key": "contour"
+            },
+            {
+              "key": "filt_fm"
+            },
+            {
+              "key": "filt_a"
+            },
+            {
+              "key": "filt_d"
+            },
+            {
+              "key": "filt_s"
+            },
+            {
+              "key": "kbd_track"
+            }
           ]
         },
         "envelopes": {
@@ -171,10 +219,18 @@
             "decay_sw"
           ],
           "params": [
-            "loud_a",
-            "loud_d",
-            "loud_s",
-            "decay_sw"
+            {
+              "key": "loud_a"
+            },
+            {
+              "key": "loud_d"
+            },
+            {
+              "key": "loud_s"
+            },
+            {
+              "key": "decay_sw"
+            }
           ]
         },
         "controllers": {
@@ -187,12 +243,24 @@
             "mod_filter"
           ],
           "params": [
-            "preset",
-            "glide",
-            "master_tune",
-            "mod_mix",
-            "mod_osc",
-            "mod_filter"
+            {
+              "key": "preset"
+            },
+            {
+              "key": "glide"
+            },
+            {
+              "key": "master_tune"
+            },
+            {
+              "key": "mod_mix"
+            },
+            {
+              "key": "mod_osc"
+            },
+            {
+              "key": "mod_filter"
+            }
           ]
         },
         "lfo": {
@@ -204,10 +272,18 @@
             "lfo_div"
           ],
           "params": [
-            "lfo_rate",
-            "lfo_shape",
-            "lfo_sync",
-            "lfo_div"
+            {
+              "key": "lfo_rate"
+            },
+            {
+              "key": "lfo_shape"
+            },
+            {
+              "key": "lfo_sync"
+            },
+            {
+              "key": "lfo_div"
+            }
           ]
         },
         "lfo_dest": {
@@ -217,8 +293,12 @@
             "lfo_filter"
           ],
           "params": [
-            "lfo_pitch",
-            "lfo_filter"
+            {
+              "key": "lfo_pitch"
+            },
+            {
+              "key": "lfo_filter"
+            }
           ]
         }
       }
