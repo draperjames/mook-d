@@ -19,9 +19,12 @@ Noise┘            contour env)         env)
 ## DSP notes
 - **Oscillators:** PolyBLEP band-limited saw/pulse/square + naive triangle.
   Ranges LO/32'/16'/8'/4'/2' map to octave multipliers; osc 3 can free-run
-  (`o3_kbd = Off`) to act as a modulation oscillator.
+  (`o3_kbd = Off`) to act as a modulation oscillator. Fundamentals above the
+  useful audio band fade before Nyquist instead of folding into a fixed
+  high-pitched tone.
 - **Filter:** Huovilainen-style nonlinear 4-pole ladder, 2× oversampled, with
-  per-stage `tanh` saturation and resonance up to self-oscillation.
+  per-stage `tanh` saturation. Cutoff combinations use a soft upper ceiling;
+  the ceiling lowers as emphasis rises to keep resonant peaks musical.
 - **Envelopes:** exponential ADSR. The Model D **Decay switch** (`decay_sw`)
   makes release track the decay time; Off gives a short release.
 - **Voice:** mono, last-note priority with an 8-deep held-note stack, glide.
@@ -35,6 +38,10 @@ Noise┘            contour env)         env)
   optionally Osc 3) phase on each master cycle — the classic sync-lead tear.
 - **Filter FM:** `filt_fm` routes Osc 3 into the ladder cutoff at audio rate
   for growl/formant tones (inharmonic when Osc 3 free-runs, `o3_kbd = Off`).
+  Filter FM, routed modulation and filter LFO depth are independently bounded.
+- **Control safety:** Continuous filter, pitch, mixer and volume controls are
+  smoothed per sample. The plugin validates every string parameter at the ABI
+  boundary and clamps non-finite or out-of-range input.
 - **Presets:** 32 native patches (`preset` param) authored for this module's
   ranges, spanning bass/lead/pad-drone/bell/FX character. Nothing copied from
   other projects — their values are calibrated to different DSP and wouldn't
@@ -52,6 +59,10 @@ The Dockerfile pins `gcc-aarch64-linux-gnu`; flags mirror the reference modules
 (`-O2 -shared -fPIC -ffast-math -lm`) and avoid `shm_open` so the GLIBC
 requirement stays at the Move's runtime level.
 
+Run the adversarial native DSP checks with `./scripts/test-dsp.sh`. They use
+AddressSanitizer/UndefinedBehaviorSanitizer and fuzz combined control values,
+MIDI extremes and truncated packets.
+
 ## Install on the Move
 Copy the built folder to the Move's modules directory (via schwung-manager or
 scp), so it lands at `.../modules/mook-d/` containing `dsp.so` + `module.json`,
@@ -64,9 +75,9 @@ works as a Signal Chain generator.
 | Osc 1 | 8′, Saw |
 | Osc 2 | 8′, Saw, Tune −0.07 st |
 | Osc 3 | 16′, Saw, Tune +0.05 st, Kbd On |
-| Mixer | O1 0.8 · O2 0.7 · O3 0.6 · Noise 0 |
-| Filter | Cutoff 0.45 · Emphasis 0.35 · Contour 0.65 |
-| Filter env | A 0.005 · D 0.35 · S 0.15 |
+| Mixer | O1 0.8 · O2 0.7 · O3 0.5 · Noise 0 |
+| Filter | Cutoff 0.38 · Emphasis 0.25 · Contour 0.45 |
+| Filter env | A 0.005 · D 0.35 · S 0.30 |
 | Loudness env | A 0.005 · D 0.5 · S 0.8 |
 | Controllers | Glide 0 · Master Tune 0 · Decay Sw On |
 
@@ -89,8 +100,8 @@ Signal use hard sync; FM Growl, Crystal Bells, Growl Bass and Alien Signal
 use filter FM.
 
 ## Contributing upstream
-See `PR_CHECKLIST.md`. Schwung requires disclosing AI
-tooling in the PR (this was built with Claude) and does not accept Grok work.
+See `PR_CHECKLIST.md`. Schwung requires disclosing AI tooling in the PR (this
+was built with Claude and OpenAI Codex) and does not accept Grok work.
 
 ## Third-party
 The Schwung Plugin API header (`src/dsp/host/plugin_api_v1.h`) is

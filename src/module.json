@@ -513,7 +513,7 @@
         "min": 0,
         "max": 1,
         "step": 0.01,
-        "default": 0.6,
+        "default": 0.5,
         "unit": "%"
       },
       {
@@ -605,10 +605,11 @@
         "name": "LFO→Ladder Filter",
         "type": "float",
         "min": 0,
-        "max": 1,
+        "max": 0.6,
         "step": 0.01,
         "default": 0.0,
-        "unit": "%"
+        "unit": "%",
+        "description": "Bounded ladder-filter modulation depth"
       },
       {
         "key": "volume",
@@ -625,31 +626,31 @@
         "name": "Cutoff (Ladder Filter)",
         "type": "float",
         "min": 0,
-        "max": 1,
+        "max": 0.85,
         "step": 0.01,
-        "default": 0.45,
+        "default": 0.38,
         "unit": "%",
-        "description": "Filter cutoff, 20 Hz–20 kHz (log)"
+        "description": "Filter cutoff; contour and modulation approach a soft 14 kHz ceiling"
       },
       {
         "key": "emphasis",
         "name": "Emphasis (Ladder Filter)",
         "type": "float",
         "min": 0,
-        "max": 1,
+        "max": 0.82,
         "step": 0.01,
-        "default": 0.35,
+        "default": 0.25,
         "unit": "%",
-        "description": "Resonance; self-oscillates near max"
+        "description": "Resonance, bounded below the digital ladder's unstable squeal region"
       },
       {
         "key": "contour",
         "name": "Contour (Ladder Filter)",
         "type": "float",
         "min": 0,
-        "max": 1,
+        "max": 0.75,
         "step": 0.01,
-        "default": 0.65,
+        "default": 0.45,
         "unit": "%",
         "description": "Amount of filter envelope"
       },
@@ -658,11 +659,11 @@
         "name": "FM (Ladder Filter)",
         "type": "float",
         "min": 0,
-        "max": 1,
+        "max": 0.4,
         "step": 0.01,
         "default": 0.0,
         "unit": "%",
-        "description": "Audio-rate Osc 3 to cutoff (growl)"
+        "description": "Bounded audio-rate Osc 3 to cutoff for growl and formant tones"
       },
       {
         "key": "filt_a",
@@ -691,7 +692,7 @@
         "min": 0,
         "max": 1,
         "step": 0.01,
-        "default": 0.15,
+        "default": 0.3,
         "unit": "%"
       },
       {
