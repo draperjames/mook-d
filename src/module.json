@@ -1,0 +1,659 @@
+{
+  "id": "mook-d",
+  "name": "Mook D",
+  "version": "0.1.0",
+  "api_version": 2,
+  "abbrev": "MOOKD",
+  "description": "Model D-style monophonic synth: three oscillators, transistor-ladder filter, dual contour envelopes, glide, LFO (tempo-syncable), oscillator hard sync and filter FM.",
+  "author": "James Draper",
+  "license": "MIT",
+  "dsp": "dsp.so",
+  "component_type": "sound_generator",
+  "capabilities": {
+    "audio_out": true,
+    "midi_in": true,
+    "chainable": true,
+    "component_type": "sound_generator",
+    "ui_hierarchy": {
+      "modes": null,
+      "levels": {
+        "root": {
+          "name": "Mook D",
+          "knobs": [
+            "preset",
+            "cutoff",
+            "emphasis",
+            "contour",
+            "glide",
+            "mix_o1",
+            "mix_o2",
+            "mix_o3"
+          ],
+          "params": [
+            {
+              "level": "osc",
+              "label": "Oscillators"
+            },
+            {
+              "level": "mixer",
+              "label": "Mixer"
+            },
+            {
+              "level": "filter",
+              "label": "Filter"
+            },
+            {
+              "level": "envelopes",
+              "label": "Envelopes"
+            },
+            {
+              "level": "controllers",
+              "label": "Controllers"
+            },
+            {
+              "level": "lfo",
+              "label": "LFO"
+            }
+          ]
+        },
+        "osc": {
+          "name": "Oscillator Bank",
+          "knobs": [
+            "o1_range",
+            "o1_wave",
+            "o2_range",
+            "o2_wave",
+            "o2_tune",
+            "o3_range",
+            "o3_wave",
+            "o3_tune"
+          ],
+          "params": [
+            "o1_range",
+            "o1_wave",
+            "o2_range",
+            "o2_wave",
+            "o2_tune",
+            "o3_range",
+            "o3_wave",
+            "o3_tune",
+            "o3_kbd",
+            "osc_sync"
+          ]
+        },
+        "mixer": {
+          "name": "Mixer",
+          "knobs": [
+            "mix_o1",
+            "mix_o2",
+            "mix_o3",
+            "mix_noise",
+            "noise_color",
+            "volume"
+          ],
+          "params": [
+            "mix_o1",
+            "mix_o2",
+            "mix_o3",
+            "mix_noise",
+            "noise_color",
+            "volume"
+          ]
+        },
+        "filter": {
+          "name": "Filter",
+          "knobs": [
+            "cutoff",
+            "emphasis",
+            "contour",
+            "filt_fm",
+            "filt_a",
+            "filt_d",
+            "filt_s",
+            "kbd_track"
+          ],
+          "params": [
+            "cutoff",
+            "emphasis",
+            "contour",
+            "filt_fm",
+            "filt_a",
+            "filt_d",
+            "filt_s",
+            "kbd_track"
+          ]
+        },
+        "envelopes": {
+          "name": "Loudness Contour",
+          "knobs": [
+            "loud_a",
+            "loud_d",
+            "loud_s",
+            "decay_sw"
+          ],
+          "params": [
+            "loud_a",
+            "loud_d",
+            "loud_s",
+            "decay_sw"
+          ]
+        },
+        "controllers": {
+          "name": "Controllers",
+          "knobs": [
+            "glide",
+            "master_tune",
+            "mod_mix",
+            "mod_osc",
+            "mod_filter"
+          ],
+          "params": [
+            "preset",
+            "glide",
+            "master_tune",
+            "mod_mix",
+            "mod_osc",
+            "mod_filter"
+          ]
+        },
+        "lfo": {
+          "name": "LFO",
+          "knobs": [
+            "lfo_rate",
+            "lfo_shape",
+            "lfo_sync",
+            "lfo_div",
+            "lfo_pitch",
+            "lfo_filter"
+          ],
+          "params": [
+            "lfo_rate",
+            "lfo_shape",
+            "lfo_sync",
+            "lfo_div",
+            "lfo_pitch",
+            "lfo_filter"
+          ]
+        }
+      }
+    },
+    "chain_params": [
+      {
+        "key": "preset",
+        "name": "Preset",
+        "type": "enum",
+        "default": "Init",
+        "options": [
+          "Init",
+          "Fat Bass",
+          "Sub Bass",
+          "Rubber Bass",
+          "Classic Lead",
+          "Brass",
+          "Funk Lead",
+          "Wobble Bass",
+          "Vibrato Lead",
+          "Sci-Fi Sweep",
+          "Bright Pluck",
+          "Detuned Stab",
+          "Whistle",
+          "Noise Sweep",
+          "Sync Lead",
+          "FM Growl",
+          "Taurus Sub",
+          "Slap Bass",
+          "Dub Bass",
+          "Growl Bass",
+          "Warm Pad",
+          "Glass Pad",
+          "Cathedral Drone",
+          "Prog Solo",
+          "Screamer Lead",
+          "Watery Lead",
+          "Simple Lead",
+          "Crystal Bells",
+          "Wind Chimes",
+          "Submarine Sonar",
+          "Alien Signal",
+          "Cosmic Drone"
+        ],
+        "description": "32 factory patches spanning bass, lead, pad/drone, bell and FX character"
+      },
+      {
+        "key": "o1_range",
+        "name": "Osc1 Range",
+        "type": "enum",
+        "default": "8'",
+        "options": [
+          "LO",
+          "32'",
+          "16'",
+          "8'",
+          "4'",
+          "2'"
+        ]
+      },
+      {
+        "key": "o1_wave",
+        "name": "Osc1 Wave",
+        "type": "enum",
+        "default": "Saw",
+        "options": [
+          "Tri",
+          "Saw",
+          "Square",
+          "Wide Pulse",
+          "Narrow Pulse"
+        ]
+      },
+      {
+        "key": "o2_range",
+        "name": "Osc2 Range",
+        "type": "enum",
+        "default": "8'",
+        "options": [
+          "LO",
+          "32'",
+          "16'",
+          "8'",
+          "4'",
+          "2'"
+        ]
+      },
+      {
+        "key": "o2_wave",
+        "name": "Osc2 Wave",
+        "type": "enum",
+        "default": "Saw",
+        "options": [
+          "Tri",
+          "Saw",
+          "Square",
+          "Wide Pulse",
+          "Narrow Pulse"
+        ]
+      },
+      {
+        "key": "o2_tune",
+        "name": "Osc2 Tune",
+        "type": "float",
+        "min": -12,
+        "max": 12,
+        "step": 0.01,
+        "default": -0.07,
+        "unit": "st"
+      },
+      {
+        "key": "o3_range",
+        "name": "Osc3 Range",
+        "type": "enum",
+        "default": "16'",
+        "options": [
+          "LO",
+          "32'",
+          "16'",
+          "8'",
+          "4'",
+          "2'"
+        ]
+      },
+      {
+        "key": "o3_wave",
+        "name": "Osc3 Wave",
+        "type": "enum",
+        "default": "Saw",
+        "options": [
+          "Tri",
+          "Saw",
+          "Square",
+          "Wide Pulse",
+          "Narrow Pulse"
+        ]
+      },
+      {
+        "key": "o3_tune",
+        "name": "Osc3 Tune",
+        "type": "float",
+        "min": -12,
+        "max": 12,
+        "step": 0.01,
+        "default": 0.05,
+        "unit": "st"
+      },
+      {
+        "key": "o3_kbd",
+        "name": "Osc3 Kbd",
+        "type": "enum",
+        "default": "On",
+        "options": [
+          "Off",
+          "On"
+        ],
+        "description": "On = tracks keyboard; Off = free-runs as mod source"
+      },
+      {
+        "key": "osc_sync",
+        "name": "Osc Sync",
+        "type": "enum",
+        "default": "Off",
+        "options": [
+          "Off",
+          "Osc2",
+          "Osc2+3"
+        ],
+        "description": "Hard sync: Osc 1 resets Osc 2 (+3) phase"
+      },
+      {
+        "key": "mix_o1",
+        "name": "Osc 1",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.8,
+        "unit": "%"
+      },
+      {
+        "key": "mix_o2",
+        "name": "Osc 2",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.7,
+        "unit": "%"
+      },
+      {
+        "key": "mix_o3",
+        "name": "Osc 3",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.6,
+        "unit": "%"
+      },
+      {
+        "key": "mix_noise",
+        "name": "Noise",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.0,
+        "unit": "%"
+      },
+      {
+        "key": "noise_color",
+        "name": "Noise Color",
+        "type": "enum",
+        "default": "White",
+        "options": [
+          "White",
+          "Pink"
+        ]
+      },
+      {
+        "key": "lfo_rate",
+        "name": "LFO Rate",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.35,
+        "unit": "%",
+        "description": "0.05–40 Hz (log), when not synced"
+      },
+      {
+        "key": "lfo_shape",
+        "name": "LFO Shape",
+        "type": "enum",
+        "default": "Tri",
+        "options": [
+          "Tri",
+          "Ramp Up",
+          "Square",
+          "Ramp Dn",
+          "S&H"
+        ]
+      },
+      {
+        "key": "lfo_sync",
+        "name": "LFO Sync",
+        "type": "enum",
+        "default": "Off",
+        "options": [
+          "Off",
+          "On"
+        ],
+        "description": "Lock LFO to host tempo (uses LFO Div)"
+      },
+      {
+        "key": "lfo_div",
+        "name": "LFO Div",
+        "type": "enum",
+        "default": "1/4",
+        "options": [
+          "4 bars",
+          "2 bars",
+          "1 bar",
+          "1/2",
+          "1/4",
+          "1/8",
+          "1/8T",
+          "1/16",
+          "1/16T",
+          "1/32"
+        ],
+        "description": "Tempo division when LFO Sync is on"
+      },
+      {
+        "key": "lfo_pitch",
+        "name": "LFO→Pitch",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.0,
+        "unit": "%"
+      },
+      {
+        "key": "lfo_filter",
+        "name": "LFO→Filter",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.0,
+        "unit": "%"
+      },
+      {
+        "key": "volume",
+        "name": "Volume",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.8,
+        "unit": "%"
+      },
+      {
+        "key": "cutoff",
+        "name": "Cutoff",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.45,
+        "unit": "%",
+        "description": "Filter cutoff, 20 Hz–20 kHz (log)"
+      },
+      {
+        "key": "emphasis",
+        "name": "Emphasis",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.35,
+        "unit": "%",
+        "description": "Resonance; self-oscillates near max"
+      },
+      {
+        "key": "contour",
+        "name": "Contour Amt",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.65,
+        "unit": "%",
+        "description": "Amount of filter envelope"
+      },
+      {
+        "key": "filt_fm",
+        "name": "Filter FM",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.0,
+        "unit": "%",
+        "description": "Audio-rate Osc 3 to cutoff (growl)"
+      },
+      {
+        "key": "filt_a",
+        "name": "Filt Atk",
+        "type": "float",
+        "min": 0.001,
+        "max": 4,
+        "step": 0.001,
+        "default": 0.005,
+        "unit": "sec"
+      },
+      {
+        "key": "filt_d",
+        "name": "Filt Dcy",
+        "type": "float",
+        "min": 0.001,
+        "max": 6,
+        "step": 0.001,
+        "default": 0.35,
+        "unit": "sec"
+      },
+      {
+        "key": "filt_s",
+        "name": "Filt Sus",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.15,
+        "unit": "%"
+      },
+      {
+        "key": "kbd_track",
+        "name": "Kbd Track",
+        "type": "enum",
+        "default": "On",
+        "options": [
+          "Off",
+          "On"
+        ]
+      },
+      {
+        "key": "loud_a",
+        "name": "Loud Atk",
+        "type": "float",
+        "min": 0.001,
+        "max": 4,
+        "step": 0.001,
+        "default": 0.005,
+        "unit": "sec"
+      },
+      {
+        "key": "loud_d",
+        "name": "Loud Dcy",
+        "type": "float",
+        "min": 0.001,
+        "max": 6,
+        "step": 0.001,
+        "default": 0.5,
+        "unit": "sec"
+      },
+      {
+        "key": "loud_s",
+        "name": "Loud Sus",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.8,
+        "unit": "%"
+      },
+      {
+        "key": "decay_sw",
+        "name": "Decay Sw",
+        "type": "enum",
+        "default": "On",
+        "options": [
+          "Off",
+          "On"
+        ],
+        "description": "On = release follows Decay (Model D). Off = short release"
+      },
+      {
+        "key": "glide",
+        "name": "Glide",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.0,
+        "unit": "%",
+        "description": "Portamento time (0 to ~1.5 s)"
+      },
+      {
+        "key": "master_tune",
+        "name": "Master Tune",
+        "type": "float",
+        "min": -2,
+        "max": 2,
+        "step": 0.01,
+        "default": 0,
+        "unit": "st"
+      },
+      {
+        "key": "mod_mix",
+        "name": "Mod Mix",
+        "type": "float",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.0,
+        "unit": "%",
+        "description": "Osc 3 (0) to Noise (1) as mod source"
+      },
+      {
+        "key": "mod_osc",
+        "name": "Osc Mod",
+        "type": "enum",
+        "default": "Off",
+        "options": [
+          "Off",
+          "On"
+        ]
+      },
+      {
+        "key": "mod_filter",
+        "name": "Filter Mod",
+        "type": "enum",
+        "default": "Off",
+        "options": [
+          "Off",
+          "On"
+        ]
+      }
+    ]
+  }
+}

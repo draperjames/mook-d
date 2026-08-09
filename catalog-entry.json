@@ -1,0 +1,11 @@
+{
+  "id": "mook-d",
+  "name": "Mook D",
+  "description": "Model D-style monophonic synth: 3 oscillators, transistor-ladder filter, dual contour envelopes, glide, tempo-syncable LFO, oscillator hard sync and filter FM.",
+  "author": "James Draper",
+  "component_type": "sound_generator",
+  "github_repo": "draperjames/mook-d",
+  "default_branch": "main",
+  "asset_name": "mook-d-module.tar.gz",
+  "min_host_version": "0.3.0"
+}

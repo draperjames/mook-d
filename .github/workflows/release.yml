@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify version match
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          MODULE_VERSION=$(grep '"version"' src/module.json | head -1 | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+          if [ "$TAG_VERSION" != "$MODULE_VERSION" ]; then
+            echo "ERROR: Tag ($TAG_VERSION) != module.json version ($MODULE_VERSION)"
+            exit 1
+          fi
+          echo "Version check passed: $TAG_VERSION"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build ARM64 module with Docker
+        run: |
+          docker build -t mook-d-builder -f scripts/Dockerfile .
+          docker run --rm -v "$PWD:/build" mook-d-builder bash -c "
+            dos2unix /build/src/dsp/*.c /build/src/dsp/host/*.h 2>/dev/null || true
+            mkdir -p /build/dist/mook-d
+            aarch64-linux-gnu-gcc \
+              -O2 -shared -fPIC -ffast-math \
+              -Wall -Wno-unused -Wno-format \
+              -I /build/src/dsp \
+              -o /build/dist/mook-d/dsp.so \
+              /build/src/dsp/mookd.c \
+              -lm
+            cp /build/src/module.json /build/dist/mook-d/
+            [ -f /build/src/help.json ] && cp /build/src/help.json /build/dist/mook-d/
+            file /build/dist/mook-d/dsp.so | grep -q aarch64 || { echo 'not aarch64'; exit 1; }
+            tar -C /build/dist -czf /build/dist/mook-d-module.tar.gz mook-d/
+          "
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/mook-d-module.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit release.json
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          BRANCH=$(git remote show origin | sed -n '/HEAD branch/s/.*: //p')
+          git fetch origin "$BRANCH"
+          git checkout -f "$BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          cat > release.json <<JSON
+          {
+            "version": "${VERSION}",
+            "download_url": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/mook-d-module.tar.gz"
+          }
+          JSON
+          git add release.json
+          git commit -m "ci: update release.json for ${{ github.ref_name }}" || echo "No changes"
+          git push origin "$BRANCH"
