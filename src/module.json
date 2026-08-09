@@ -76,7 +76,8 @@
           "name": "Preset",
           "list_param": "preset",
           "count_param": "preset_count",
-          "name_param": "preset_name"
+          "name_param": "preset_name",
+          "navigate_to": "root"
         },
         "osc1": {
           "name": "Oscillator 1",
