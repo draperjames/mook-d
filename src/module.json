@@ -31,6 +31,10 @@
           ],
           "params": [
             {
+              "level": "preset_picker",
+              "label": "Preset"
+            },
+            {
               "level": "osc1",
               "label": "Oscillator 1"
             },
@@ -67,6 +71,12 @@
               "label": "LFO Routing"
             }
           ]
+        },
+        "preset_picker": {
+          "name": "Preset",
+          "list_param": "preset",
+          "count_param": "preset_count",
+          "name_param": "preset_name"
         },
         "osc1": {
           "name": "Oscillator 1",
