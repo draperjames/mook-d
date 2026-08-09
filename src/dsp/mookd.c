@@ -417,6 +417,57 @@ static const char *const LFO_DIV_NAMES[10] = {"4 bars","2 bars","1 bar","1/2","1
 static const float LFO_DIV_BEATS[10]       = { 16.0f,   8.0f,    4.0f,   2.0f, 1.0f, 0.5f, 0.3333f,0.25f, 0.16667f,0.125f };
 static const char *const SYNC_NAMES[3]     = {"Off","Osc2","Osc2+3"};
 
+/*
+ * Serve the hierarchy through the plugin ABI, matching Osirus. Schwung 0.11.6
+ * discards a module.json hierarchy whose inline objects omit repeated "type"
+ * metadata, even though Shadow can resolve key-only objects via chain_params.
+ */
+static const char UI_HIERARCHY_JSON[] =
+    "{\"modes\":null,\"levels\":{"
+      "\"root\":{"
+        "\"name\":\"Mook D\",\"list_param\":\"preset\",\"count_param\":\"preset_count\","
+        "\"name_param\":\"preset_name\",\"children\":null,"
+        "\"knobs\":[\"cutoff\",\"emphasis\",\"contour\",\"filt_a\",\"filt_d\",\"loud_a\",\"loud_d\",\"glide\"],"
+        "\"params\":["
+          "{\"key\":\"cutoff\"},{\"key\":\"emphasis\"},{\"key\":\"contour\"},"
+          "{\"key\":\"filt_a\"},{\"key\":\"filt_d\"},{\"key\":\"loud_a\"},"
+          "{\"key\":\"loud_d\"},{\"key\":\"glide\"},"
+          "{\"level\":\"osc1\",\"label\":\"Oscillator 1\"},"
+          "{\"level\":\"osc2\",\"label\":\"Oscillator 2\"},"
+          "{\"level\":\"osc3\",\"label\":\"Oscillator 3\"},"
+          "{\"level\":\"mixer\",\"label\":\"Mixer\"},"
+          "{\"level\":\"filter\",\"label\":\"Ladder Filter\"},"
+          "{\"level\":\"envelopes\",\"label\":\"Envelopes\"},"
+          "{\"level\":\"controllers\",\"label\":\"Controllers\"},"
+          "{\"level\":\"lfo\",\"label\":\"LFO\"},"
+          "{\"level\":\"lfo_dest\",\"label\":\"LFO Routing\"}"
+        "]"
+      "},"
+      "\"osc1\":{\"name\":\"Oscillator 1\",\"knobs\":[\"o1_range\",\"o1_wave\"],"
+        "\"params\":[{\"key\":\"o1_range\"},{\"key\":\"o1_wave\"}]},"
+      "\"osc2\":{\"name\":\"Oscillator 2\",\"knobs\":[\"o2_range\",\"o2_wave\",\"o2_tune\"],"
+        "\"params\":[{\"key\":\"o2_range\"},{\"key\":\"o2_wave\"},{\"key\":\"o2_tune\"}]},"
+      "\"osc3\":{\"name\":\"Oscillator 3\","
+        "\"knobs\":[\"o3_range\",\"o3_wave\",\"o3_tune\",\"o3_kbd\",\"osc_sync\"],"
+        "\"params\":[{\"key\":\"o3_range\"},{\"key\":\"o3_wave\"},{\"key\":\"o3_tune\"},{\"key\":\"o3_kbd\"},{\"key\":\"osc_sync\"}]},"
+      "\"mixer\":{\"name\":\"Mixer\","
+        "\"knobs\":[\"mix_o1\",\"mix_o2\",\"mix_o3\",\"mix_noise\",\"noise_color\",\"volume\"],"
+        "\"params\":[{\"key\":\"mix_o1\"},{\"key\":\"mix_o2\"},{\"key\":\"mix_o3\"},{\"key\":\"mix_noise\"},{\"key\":\"noise_color\"},{\"key\":\"volume\"}]},"
+      "\"filter\":{\"name\":\"Ladder Filter\","
+        "\"knobs\":[\"cutoff\",\"emphasis\",\"contour\",\"filt_fm\",\"filt_a\",\"filt_d\",\"filt_s\",\"kbd_track\"],"
+        "\"params\":[{\"key\":\"cutoff\"},{\"key\":\"emphasis\"},{\"key\":\"contour\"},{\"key\":\"filt_fm\"},{\"key\":\"filt_a\"},{\"key\":\"filt_d\"},{\"key\":\"filt_s\"},{\"key\":\"kbd_track\"}]},"
+      "\"envelopes\":{\"name\":\"Loudness Contour\","
+        "\"knobs\":[\"loud_a\",\"loud_d\",\"loud_s\",\"decay_sw\"],"
+        "\"params\":[{\"key\":\"loud_a\"},{\"key\":\"loud_d\"},{\"key\":\"loud_s\"},{\"key\":\"decay_sw\"}]},"
+      "\"controllers\":{\"name\":\"Controllers\","
+        "\"knobs\":[\"preset\",\"glide\",\"master_tune\",\"mod_mix\",\"mod_osc\",\"mod_filter\"],"
+        "\"params\":[{\"key\":\"preset\"},{\"key\":\"glide\"},{\"key\":\"master_tune\"},{\"key\":\"mod_mix\"},{\"key\":\"mod_osc\"},{\"key\":\"mod_filter\"}]},"
+      "\"lfo\":{\"name\":\"LFO\",\"knobs\":[\"lfo_rate\",\"lfo_shape\",\"lfo_sync\",\"lfo_div\"],"
+        "\"params\":[{\"key\":\"lfo_rate\"},{\"key\":\"lfo_shape\"},{\"key\":\"lfo_sync\"},{\"key\":\"lfo_div\"}]},"
+      "\"lfo_dest\":{\"name\":\"LFO Routing\",\"knobs\":[\"lfo_pitch\",\"lfo_filter\"],"
+        "\"params\":[{\"key\":\"lfo_pitch\"},{\"key\":\"lfo_filter\"}]}"
+    "}}";
+
 static void set_param(void *inst, const char *k, const char *v){
     synth_t *s = (synth_t*)inst; params_t *p = &s->p;
     if      (!strcmp(k,"o1_range")){ p->o1_range=eparse(v,RANGE_NAMES,6); s->o1.range=p->o1_range; }
@@ -482,7 +533,8 @@ static void set_param(void *inst, const char *k, const char *v){
  * as their numeric index (matches eparse()'s wire format on the way in). */
 static int get_param(void *inst, const char *k, char *buf, int n){
     synth_t *s = (synth_t*)inst; params_t *p = &s->p; float f; int i;
-    if      (!strcmp(k,"o1_range"))    i=p->o1_range;
+    if      (!strcmp(k,"ui_hierarchy")) return snprintf(buf, n, "%s", UI_HIERARCHY_JSON);
+    else if (!strcmp(k,"o1_range"))    i=p->o1_range;
     else if (!strcmp(k,"o1_wave"))     i=p->o1_wave;
     else if (!strcmp(k,"o2_range"))    i=p->o2_range;
     else if (!strcmp(k,"o2_wave"))     i=p->o2_wave;

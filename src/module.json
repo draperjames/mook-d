@@ -19,20 +19,44 @@
       "levels": {
         "root": {
           "name": "Mook D",
+          "list_param": "preset",
+          "count_param": "preset_count",
+          "name_param": "preset_name",
+          "children": null,
           "knobs": [
-            "preset",
             "cutoff",
             "emphasis",
             "contour",
-            "glide",
-            "mix_o1",
-            "mix_o2",
-            "mix_o3"
+            "filt_a",
+            "filt_d",
+            "loud_a",
+            "loud_d",
+            "glide"
           ],
           "params": [
             {
-              "level": "preset_picker",
-              "label": "Preset"
+              "key": "cutoff"
+            },
+            {
+              "key": "emphasis"
+            },
+            {
+              "key": "contour"
+            },
+            {
+              "key": "filt_a"
+            },
+            {
+              "key": "filt_d"
+            },
+            {
+              "key": "loud_a"
+            },
+            {
+              "key": "loud_d"
+            },
+            {
+              "key": "glide"
             },
             {
               "level": "osc1",
@@ -52,7 +76,7 @@
             },
             {
               "level": "filter",
-              "label": "Filter"
+              "label": "Ladder Filter"
             },
             {
               "level": "envelopes",
@@ -71,13 +95,6 @@
               "label": "LFO Routing"
             }
           ]
-        },
-        "preset_picker": {
-          "name": "Preset",
-          "list_param": "preset",
-          "count_param": "preset_count",
-          "name_param": "preset_name",
-          "navigate_to": "root"
         },
         "osc1": {
           "name": "Oscillator 1",
@@ -172,7 +189,7 @@
           ]
         },
         "filter": {
-          "name": "Filter",
+          "name": "Ladder Filter",
           "knobs": [
             "cutoff",
             "emphasis",
@@ -585,7 +602,7 @@
       },
       {
         "key": "lfo_filter",
-        "name": "LFO→Filter",
+        "name": "LFO→Ladder Filter",
         "type": "float",
         "min": 0,
         "max": 1,
@@ -605,7 +622,7 @@
       },
       {
         "key": "cutoff",
-        "name": "Cutoff",
+        "name": "Cutoff (Ladder Filter)",
         "type": "float",
         "min": 0,
         "max": 1,
@@ -616,7 +633,7 @@
       },
       {
         "key": "emphasis",
-        "name": "Emphasis",
+        "name": "Emphasis (Ladder Filter)",
         "type": "float",
         "min": 0,
         "max": 1,
@@ -627,7 +644,7 @@
       },
       {
         "key": "contour",
-        "name": "Contour Amt",
+        "name": "Contour (Ladder Filter)",
         "type": "float",
         "min": 0,
         "max": 1,
@@ -638,7 +655,7 @@
       },
       {
         "key": "filt_fm",
-        "name": "Filter FM",
+        "name": "FM (Ladder Filter)",
         "type": "float",
         "min": 0,
         "max": 1,
@@ -649,7 +666,7 @@
       },
       {
         "key": "filt_a",
-        "name": "Filt Atk",
+        "name": "Env Attack (Ladder Filter)",
         "type": "float",
         "min": 0.001,
         "max": 4,
@@ -659,7 +676,7 @@
       },
       {
         "key": "filt_d",
-        "name": "Filt Dcy",
+        "name": "Env Decay (Ladder Filter)",
         "type": "float",
         "min": 0.001,
         "max": 6,
@@ -669,7 +686,7 @@
       },
       {
         "key": "filt_s",
-        "name": "Filt Sus",
+        "name": "Env Sustain (Ladder Filter)",
         "type": "float",
         "min": 0,
         "max": 1,
@@ -679,7 +696,7 @@
       },
       {
         "key": "kbd_track",
-        "name": "Kbd Track",
+        "name": "Key Track (Ladder Filter)",
         "type": "enum",
         "default": "On",
         "options": [
@@ -772,7 +789,7 @@
       },
       {
         "key": "mod_filter",
-        "name": "Filter Mod",
+        "name": "Mod→Ladder Filter",
         "type": "enum",
         "default": "Off",
         "options": [
