@@ -42,6 +42,7 @@ jobs:
               -lm
             cp /build/src/module.json /build/dist/mook-d/
             [ -f /build/src/help.json ] && cp /build/src/help.json /build/dist/mook-d/
+            [ -f /build/src/ui.js ] && cp /build/src/ui.js /build/dist/mook-d/
             file /build/dist/mook-d/dsp.so | grep -q aarch64 || { echo 'not aarch64'; exit 1; }
             tar -C /build/dist -czf /build/dist/mook-d-module.tar.gz mook-d/
           "

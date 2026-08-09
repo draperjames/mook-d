@@ -22,6 +22,7 @@ CONTAINER_ID=$(docker create ${MODULE_ID}-builder bash -c "
       -lm
     cp /build/src/module.json /build/dist/$MODULE_ID/
     [ -f /build/src/help.json ] && cp /build/src/help.json /build/dist/$MODULE_ID/ || true
+    [ -f /build/src/ui.js ] && cp /build/src/ui.js /build/dist/$MODULE_ID/ || true
     echo '=== Build complete ==='
     ls -la /build/dist/$MODULE_ID/
     echo '=== GLIBC symbols (want <= 2.27) ==='
@@ -38,6 +39,7 @@ mkdir -p "$ROOT/dist/$MODULE_ID"
 docker cp "$CONTAINER_ID:/build/dist/$MODULE_ID/dsp.so"      "$ROOT/dist/$MODULE_ID/dsp.so"
 docker cp "$CONTAINER_ID:/build/dist/$MODULE_ID/module.json" "$ROOT/dist/$MODULE_ID/module.json"
 docker cp "$CONTAINER_ID:/build/dist/$MODULE_ID/help.json"   "$ROOT/dist/$MODULE_ID/help.json" 2>/dev/null || true
+docker cp "$CONTAINER_ID:/build/dist/$MODULE_ID/ui.js"       "$ROOT/dist/$MODULE_ID/ui.js" 2>/dev/null || true
 docker rm "$CONTAINER_ID" >/dev/null
 
 cd "$ROOT/dist"

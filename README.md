@@ -45,7 +45,7 @@ Noise┘            contour env)         env)
 ## Build (ARM64, requires Docker)
 ```bash
 ./scripts/build.sh
-# → dist/mook-d/{dsp.so,module.json,help.json}
+# → dist/mook-d/{dsp.so,module.json,help.json,ui.js}
 # → dist/mook-d-module.tar.gz
 ```
 The Dockerfile pins `gcc-aarch64-linux-gnu`; flags mirror the reference modules
@@ -54,9 +54,9 @@ requirement stays at the Move's runtime level.
 
 ## Install on the Move
 Copy the built folder to the Move's modules directory (via schwung-manager or
-scp), so it lands at `.../modules/mook-d/` containing `dsp.so` + `module.json`,
-then load **Mook D** from the sound-generator list. It's `chainable`, so it also
-works as a Signal Chain generator.
+scp), so it lands at `.../modules/mook-d/` containing `dsp.so` + `module.json`
++ `ui.js`, then load **Mook D** from the sound-generator list. It's
+`chainable`, so it also works as a Signal Chain generator.
 
 ## Starting patch — classic fat bass/lead
 | Section | Setting |
@@ -74,14 +74,20 @@ For the pitch-wobble variant: Osc 3 → LO range, `o3_kbd` Off, `mod_mix` 0,
 `mod_osc` On.
 
 ## Presets
-**Original 16:** Init · Fat Bass · Sub Bass · Rubber Bass · Classic Lead ·
-Brass · Funk Lead · Wobble Bass · Vibrato Lead · Sci-Fi Sweep · Bright Pluck ·
-Detuned Stab · Whistle · Noise Sweep · Sync Lead · FM Growl.
+32 patches organized into 4 banks, browsable on-device via `ui.js` (Left/
+Right = step patch, **Shift+Left/Right = step bank**, jog wheel = scrub,
+Up/Down = octave ±4) — the same bank/patch navigation model used by other
+Schwung sound generators (e.g. `schwung-obxd`, `schwung-virus`/Osirus),
+built on the shared `sound_generator_ui.mjs` base. When used as a chained
+Signal Chain component (no dedicated screen), the full flat list is still
+available via the `preset` enum parameter.
 
-**Expansion 16:** Taurus Sub · Slap Bass · Dub Bass · Growl Bass · Warm Pad ·
-Glass Pad · Cathedral Drone · Prog Solo · Screamer Lead · Watery Lead ·
-Simple Lead · Crystal Bells · Wind Chimes · Submarine Sonar · Alien Signal ·
-Cosmic Drone.
+| Bank | Patches |
+|---|---|
+| **A — Bass** (10) | Init · Fat Bass · Sub Bass · Rubber Bass · Wobble Bass · FM Growl · Taurus Sub · Slap Bass · Dub Bass · Growl Bass |
+| **B — Lead** (10) | Classic Lead · Brass · Funk Lead · Vibrato Lead · Detuned Stab · Sync Lead · Prog Solo · Screamer Lead · Watery Lead · Simple Lead |
+| **C — Pad/Drone** (4) | Warm Pad · Glass Pad · Cathedral Drone · Cosmic Drone |
+| **D — Bell/FX** (8) | Bright Pluck · Crystal Bells · Wind Chimes · Sci-Fi Sweep · Whistle · Noise Sweep · Submarine Sonar · Alien Signal |
 
 Wobble/Sci-Fi/Vibrato/Whistle/Noise/Wind Chimes/Submarine Sonar/Cosmic Drone
 use the LFO (Wobble and Cosmic Drone are tempo-synced); Sync Lead and Alien
