@@ -31,8 +31,16 @@
           ],
           "params": [
             {
-              "level": "osc",
-              "label": "Oscillators"
+              "level": "osc1",
+              "label": "Oscillator 1"
+            },
+            {
+              "level": "osc2",
+              "label": "Oscillator 2"
+            },
+            {
+              "level": "osc3",
+              "label": "Oscillator 3"
             },
             {
               "level": "mixer",
@@ -53,27 +61,47 @@
             {
               "level": "lfo",
               "label": "LFO"
+            },
+            {
+              "level": "lfo_dest",
+              "label": "LFO Routing"
             }
           ]
         },
-        "osc": {
-          "name": "Oscillator Bank",
+        "osc1": {
+          "name": "Oscillator 1",
           "knobs": [
             "o1_range",
-            "o1_wave",
-            "o2_range",
-            "o2_wave",
-            "o2_tune",
-            "o3_range",
-            "o3_wave",
-            "o3_tune"
+            "o1_wave"
           ],
           "params": [
             "o1_range",
-            "o1_wave",
+            "o1_wave"
+          ]
+        },
+        "osc2": {
+          "name": "Oscillator 2",
+          "knobs": [
             "o2_range",
             "o2_wave",
-            "o2_tune",
+            "o2_tune"
+          ],
+          "params": [
+            "o2_range",
+            "o2_wave",
+            "o2_tune"
+          ]
+        },
+        "osc3": {
+          "name": "Oscillator 3",
+          "knobs": [
+            "o3_range",
+            "o3_wave",
+            "o3_tune",
+            "o3_kbd",
+            "osc_sync"
+          ],
+          "params": [
             "o3_range",
             "o3_wave",
             "o3_tune",
@@ -162,15 +190,22 @@
             "lfo_rate",
             "lfo_shape",
             "lfo_sync",
-            "lfo_div",
-            "lfo_pitch",
-            "lfo_filter"
+            "lfo_div"
           ],
           "params": [
             "lfo_rate",
             "lfo_shape",
             "lfo_sync",
-            "lfo_div",
+            "lfo_div"
+          ]
+        },
+        "lfo_dest": {
+          "name": "LFO Routing",
+          "knobs": [
+            "lfo_pitch",
+            "lfo_filter"
+          ],
+          "params": [
             "lfo_pitch",
             "lfo_filter"
           ]

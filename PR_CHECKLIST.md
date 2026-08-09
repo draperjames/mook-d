@@ -4,7 +4,7 @@ Mook D ships as its own repo (like `schwung-dx7`, `schwung-sf2`, `aphex-move`)
 and is registered in the host via a one-entry PR to `module-catalog.json`.
 
 ## A. Your module repo (draperjames/mook-d)
-- [ ] Push this tree to `main`.
+- [x] Push this tree to `main`.
 - [ ] Tag a release: `git tag v0.1.0 && git push --tags`.
       The Release workflow cross-compiles the ARM64 `dsp.so`, verifies it's
       `aarch64`, packages `mook-d-module.tar.gz`, publishes the GitHub Release,
