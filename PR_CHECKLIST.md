@@ -5,12 +5,14 @@ and is registered in the host via a one-entry PR to `module-catalog.json`.
 
 ## A. Your module repo (draperjames/mook-d)
 - [x] Push this tree to `main`.
-- [ ] Tag a release: `git tag v0.1.0 && git push --tags`.
+- [x] Tag a release: `git tag v0.1.1 && git push --tags`.
       The Release workflow cross-compiles the ARM64 `dsp.so`, verifies it's
       `aarch64`, packages `mook-d-module.tar.gz`, publishes the GitHub Release,
       and commits `release.json`.
-- [ ] Confirm the release asset exists at the `download_url` in `release.json`.
-- [ ] Verify `module.json` `version` == the tag (the workflow enforces this).
+      (v0.1.0 failed CI due to a missing `file(1)` binary in the builder
+      image, fixed and re-cut as v0.1.1 rather than force-moving the tag.)
+- [x] Confirm the release asset exists at the `download_url` in `release.json`.
+- [x] Verify `module.json` `version` == the tag (the workflow enforces this).
 
 ## B. Upstream PR (charlesvestal/schwung)
 - [ ] Fork, branch: `git switch -c add-mook-d`.
