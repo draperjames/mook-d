@@ -588,7 +588,11 @@ static void set_param(void *inst, const char *k, const char *v){
             if (m && !*a && !*b){ idx=i; break; }
         }
         if (idx < 0) idx = (int)strtol(v, NULL, 10);  /* numeric fallback */
-        if (idx >= 0 && idx < NPRESETS) s->preset_idx = idx;
+        /* A host may restore a stale preset index after the bank changes.
+         * Do not let that become an out-of-bounds lookup; leave the current
+         * patch intact until it sends a valid name or index. */
+        if (idx < 0 || idx >= NPRESETS) return;
+        s->preset_idx = idx;
         apply_preset(p, idx);
         s->o1.range=p->o1_range; s->o1.wave=p->o1_wave;
         s->o2.range=p->o2_range; s->o2.wave=p->o2_wave;

@@ -110,6 +110,15 @@ int main(void)
     assert_param(api, s, "o1_range", "5");
     assert_param(api, s, "o1_wave", "0");
 
+    /* Hosts can restore stale preset identifiers. Invalid selections must
+     * leave the active patch intact instead of indexing outside PRESETS. */
+    api->set_param(s, "preset", "Fat Bass");
+    assert_param(api, s, "preset", "1");
+    api->set_param(s, "preset", "999");
+    assert_param(api, s, "preset", "1");
+    api->set_param(s, "preset", "-1");
+    assert_param(api, s, "preset", "1");
+
     /* Every factory patch must survive the playable MIDI range and extreme
      * public filter controls without contaminating internal state. */
     const int notes[] = {0, 36, 60, 84, 108, 127};

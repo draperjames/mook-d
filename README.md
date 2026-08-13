@@ -16,6 +16,22 @@ Osc3 ┘           (cutoff/emphasis/    (loudness
 Noise┘            contour env)         env)
 ```
 
+## Editing the Model D surface
+Mook D is not preset-only. The root page deliberately reserves its eight
+immediately reachable controls for filter and contour performance; open the
+named sections below it to edit the rest of the instrument:
+
+| Model D area | Mook D section | Editable controls |
+|---|---|---|
+| Oscillator bank | Oscillator 1 / 2 / 3 | Range, waveform, Osc 2/3 tune, Osc 3 keyboard control |
+| Mixer | Mixer | Each oscillator level, noise level/color, volume |
+| Filter | Ladder Filter | Cutoff, emphasis, contour, filter ADS, key tracking |
+| Loudness contour | Loudness Contour | Attack, decay, sustain, Model D decay switch |
+| Controllers | Controllers | Glide, master tune, osc-3/noise modulation mix and pitch/filter routes |
+
+The separate LFO, hard sync and filter FM are Mook D additions rather than
+replacements for those classic controls.
+
 ## DSP notes
 - **Oscillators:** PolyBLEP band-limited saw/pulse/square + naive triangle.
   Ranges LO/32'/16'/8'/4'/2' map to octave multipliers; osc 3 can free-run
