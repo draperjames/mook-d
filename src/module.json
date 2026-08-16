@@ -1,7 +1,7 @@
 {
   "id": "mook-d",
   "name": "Mook D",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "api_version": 2,
   "abbrev": "MOOKD",
   "description": "Model D-style monophonic synth: three oscillators, transistor-ladder filter, dual contour envelopes, glide, LFO (tempo-syncable), oscillator hard sync and filter FM.",
